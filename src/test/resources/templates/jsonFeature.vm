@@ -1,0 +1,88 @@
+$callbackHeader{
+  "type": "FeatureCollection",
+  "features": [
+#foreach( $feature in $featureList )
+      {
+          "type": "Feature",
+          "id": "$feature.getIdentifier()",
+          "bbox": [$feature.getXmax(), $feature.getYmin(), $feature.getXmin(), $feature.getYmax()],
+          "properties": {
+              "name": "$feature.getName()",
+              "sourceid": "#if($feature.getSourceIdentifier() != 0.0)$feature.getSourceIdentifier()#else
+unknown#end",
+#if($feature.getCountry())
+              "country": "$feature.getCountry()",
+#end
+#if($feature.getCountryCode())
+              "countrycode": "$feature.getCountryCode()",
+#end
+#if($feature.getAdminLevel1())
+              "adminlevel1": "$feature.getAdminLevel1()",
+#end
+#if($feature.getAdminLevel2())
+              "adminlevel2": "$feature.getAdminLevel2()",
+#end
+#if($feature.getAdminLevel3())
+              "adminlevel3": "$feature.getAdminLevel3()",
+#end
+#if($feature.getAdminLevel4())
+              "adminlevel4": "$feature.getAdminLevel4()",
+#end
+              "featuretype": "$feature.getFeatureType()",
+              "unlockFeatureCode": "$feature.getEdinaFeatureCode()",
+              "custodian": "$feature.getCustodian()",
+              "gazetteer": "$feature.getGazetteer()",
+#if($feature.getScale())
+              "scale": "$feature.getScale()",
+#end
+              "centroid": "$feature.getXCentroid(), $feature.getYCentroid()",
+#if($feature.getArea() != 0.0)
+              "area": "$feature.getArea()",
+#end
+#if($feature.getPerimeter() != 0.0)
+              "perimeter": "$feature.getPerimeter()",
+#end
+#if($feature.getElevation() != 0.0)
+              "elevation": "$feature.getElevation()",
+#end    
+#if($feature.getPopulation() != 0.0)
+              "population": "$feature.getPopulation()",
+#end
+#if($feature.getAlternativeNames() && $feature.getAlternativeNamesJSON() != "")
+              "altnames": "$feature.getAlternativeNames()",
+#end
+#if($feature.getAlternativeIds().size() != 0.0)
+              "altidentifiers": [#foreach($altId in $feature.getAlternativeIds())$altId#if ($velocityCount != $feature.getAlternativeIds().size()), #end#end],
+#end
+              "footprint": "http://unlock.edina.ac.uk/ws/footprintLookup?format=json&identifier=$feature.getIdentifier()$key"#if($feature.getUriins()),#end
+              
+#if($feature.getUriins())
+              "uriins": "$feature.getUriins()",
+#end
+#if($feature.getUricdda())
+              "uricdda": "$feature.getUricdda()",
+#end
+#if($feature.getMadsid())
+              "madsid": "$feature.getMadsid()",
+#end
+#if($feature.getVariantid())
+              "variantid": "$feature.getVariantid()",
+#end
+#if($feature.getAttestations())
+              "attestations": "$feature.getAttestationsEscapedJavascript()",
+#end
+#if($feature.getLocations())
+              "locations": "$feature.getLocationsEscapedJavascript()",
+#end
+#if($feature.getUnlockfpsrc())
+              "unlockfpsrc": "$feature.getUnlockfpsrc()"
+#end
+
+          }
+      }#if ($velocityCount != $featureList.size()),
+#end
+#end
+  
+  ],
+  "totalResults": "$totalResultsCount"
+}$callbackFooter

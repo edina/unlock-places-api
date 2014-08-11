@@ -1,0 +1,3 @@
+$callbackHeader{
+  "distance": "#if($distance)$distance#end"
+}$callbackFooter

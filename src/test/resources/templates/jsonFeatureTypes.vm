@@ -1,0 +1,15 @@
+{
+  "totalResults": "$totalFeatureTypesCount",
+  "featureTypes": [
+#foreach( $featureType in $featureTypesList )
+      {
+          "type": "featureType",
+          "name": "$featureType.getName()",
+          "featureCode": "$featureType.getFeatureCode()",
+          "hierarchyLevel": "$featureType.getHierarchyLevel()"
+      }#if ($velocityCount != $featureTypesList.size()),
+#end
+#end
+
+  ]
+}

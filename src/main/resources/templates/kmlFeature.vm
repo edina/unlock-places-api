@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+#if($totalResultsCount == 0)
+  <Document/>
+#else
+  <Document>
+    <Style id="unlockStyle">
+      <LineStyle>
+        <width>2</width>
+        <color>ff0000ff</color>
+      </LineStyle>
+      <PolyStyle>
+        <fill>0</fill>
+        <outline>1</outline>
+      </PolyStyle>
+    </Style>
+#foreach( $feature in $featureList )
+	<Folder xmlns="">
+      <name>$feature.getNameEscapedXML()</name>
+      <open>0</open>
+      <Placemark id="$feature.getIdentifier()">
+        <name>Bounding Box for $feature.getName()</name>
+        <description>
+        <![CDATA[
+        <ul>
+        <li><b>Name:</b> $feature.getNameEscapedXML()</li>
+        
+        <li><b>Feature type:</b> $feature.getFeatureType()</li>
+        <li><b>Unlock Feature code:</b> $feature.getEdinaFeatureCode()</li>
+        ]]>
+        
+        #if($feature.getCountry())
+        <![CDATA[
+        <li><b>Country:</b> #if($feature.getCountry())$feature.getCountry()#end</li>
+        <li><b>Country code:</b> #if($feature.getCountryCode())$feature.getCountryCode()#end</li>
+        ]]>
+        #end
+        
+        <![CDATA[
+        <li><b>Custodian:</b> $feature.getCustodian()</li>
+        <li><b>Gazetteer:</b> $feature.getGazetteer()</li>
+        <li><b>Source id:</b> #if($feature.getSourceIdentifier() != 0.0)$feature.getSourceIdentifier()#else
+unknown#end</li>  
+        #if($feature.getUriins())
+<li><b>uriins:</b> $feature.getUriins()</li>
+        #end
+        #if($feature.getUricdda())
+<li><b>uricdda:</b> $feature.getUricdda()</li>
+        #end
+        #if($feature.getMadsid())
+<li><b>madsid:</b> $feature.getMadsid()</li>
+        #end
+        #if($feature.getVariantid())
+<li><b>variantid:</b> $feature.getVariantid()</li>
+        #end
+        #if($feature.getAttestations())
+<li><b>attestations:</b> $feature.getAttestations()</li>
+        #end
+       #if($feature.getLocations())
+<li><b>locations:</b> $feature.getLocationsEscapedJavascript()</li>
+        #end
+      #if($feature.getUnlockfpsrc())
+<li><b>unlockfpsrc:</b> $feature.getUnlockfpsrc()</li>
+        #end
+</ul>
+      
+        <a href="http://unlock.edina.ac.uk/ws/footprintLookup?format=kml&identifier=$feature.getIdentifier()$key">Footprint geometry (Feature id: $feature.getIdentifier())</a>
+        ]]>
+        </description>
+        <styleUrl>#unlockStyle</styleUrl>
+        <Polygon>
+          <outerBoundaryIs>
+            <LinearRing>
+              <coordinates>$feature.getXmax(),$feature.getYmin(),0 $feature.getXmax(),$feature.getYmax(),0 $feature.getXmin(),$feature.getYmax(),0 $feature.getXmin(),$feature.getYmin(),0 $feature.getXmax(),$feature.getYmin(),0</coordinates>
+            </LinearRing>
+          </outerBoundaryIs>
+        </Polygon>
+      </Placemark>
+	</Folder>
+#end
+  </Document>
+#end
+</kml>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+#if($totalFootprintCount == 0)
+<Document/>
+#else
+<Document>
+<Style id="unlockStyle">
+  <LineStyle>
+    <color>ccffffff</color>
+    <width>5</width>
+  </LineStyle>
+  <PolyStyle>
+    <color>80ffaa00</color>
+  </PolyStyle>
+</Style>
+<Placemark id="$identifier">
+<description>Footprint from $custodian gazetteer</description>
+<styleUrl>#unlockStyle</styleUrl>
+$output
+</Placemark>
+</Document>
+#end
+</kml>

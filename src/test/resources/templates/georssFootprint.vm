@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" 
+  xmlns:georss="http://www.georss.org/georss">
+  #if($totalFootprintCount == 0)
+	<title>GeoCrossWalk results</title>
+	<subtitle>Total results: 0</subtitle>
+	<link href="http://www.geoxwalk.ac.uk/"/>
+	<updated>2009-10-01T00:00:00Z</updated>
+	<author>
+	<name>EDINA</name>
+	<email>edina@ed.ac.uk</email>
+	</author>
+  #else
+  <title>GeoCrossWalk</title>
+  <subtitle>GeoCrossWalk gazetteer results</subtitle>
+  <link href="http://www.geoxwalk.ac.uk"/>
+  <updated>2009-10-01T00:00:00Z</updated>
+  <author>
+    <name>EDINA</name>
+    <email>edina@ed.ac.uk</email>
+  </author>
+  <id>$identifier</id>
+  <entry>
+    <id>$identifier</id>
+    <summary>$custodian</summary>
+		$output
+  </entry>
+  #end
+</feed>

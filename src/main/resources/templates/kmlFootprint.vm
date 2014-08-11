@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+#if($totalFootprintCount == 0)
+<Document/>
+#else
+<Document>
+<Style id="unlockStyle">
+  <LineStyle>
+    <color>ccffffff</color>
+    <width>2</width>
+  </LineStyle>
+  <PolyStyle>
+    <color>4cffaa00</color>
+  </PolyStyle>
+</Style>
+$output
+</Document>
+#end
+</kml>

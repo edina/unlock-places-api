@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.0r4/build/reset/reset-min.css" />
+
+<title>Feature Types</title>
+
+</head>
+
+<body>
+
+#if($totalFeatureTypesCount == 0)
+	$totalFeatureTypesCount
+#else
+Total feature types: $totalFeatureTypesCount
+<table>
+<tr>
+<th>name</th>
+<th>featurecode</th>
+<th>hierarchylevel</th>
+</tr>
+#foreach( $featureType in $featureTypesList )
+<tr><td>$featureType.getName()</td><td> $featureType.getFeatureCode()</td><td> $featureType.getHierarchyLevel()</td></tr>#if ($velocityCount != $featureTypesList.size())
+
+#end
+#end
+</table>
+#end
+
+</body>
+
+</html>

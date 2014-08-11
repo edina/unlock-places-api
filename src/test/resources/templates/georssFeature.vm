@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" 
+			xmlns:georss="http://www.georss.org/georss"
+			xmlns:gml="http://www.opengis.net/gml">
+  #if($totalResultsCount == 0)
+	<title>Unlock results</title>
+	<subtitle>Total results: 0</subtitle>
+	<link href="http://unlock.edina.ac.uk/"/>
+	<updated>2009-10-01T00:00:00Z</updated>
+	<author>
+	<name>EDINA</name>
+	<email>edina@ed.ac.uk</email>
+	</author>
+  #else
+  <title>Unlock results</title>
+  <subtitle>Total results: $totalResultsCount</subtitle>
+  <link href="http://unlock.edina.ac.uk/"/>
+  <updated>2009-10-01T00:00:00Z</updated>
+  <author>
+    <name>EDINA</name>
+    <email>edina@ed.ac.uk</email>
+  </author>
+  <id>http://unlock.edina.ac.uk/</id>
+#foreach( $feature in $featureList )
+  <entry>
+    <title>$feature.getNameEscapedXML()</title>
+    <link href="http://unlock.edina.ac.uk/ws/footprintLookup?format=georss&amp;identifier=$feature.getIdentifier()$key"/>
+    <id>$feature.getIdentifier()</id>
+    <updated>2009-10-01T00:00:00Z</updated>
+    <summary>
+    <![CDATA[
+        <ul>
+        <li><b>Name:</b> $feature.getNameEscapedXML()</li>
+        
+        <li><b>Feature type:</b> $feature.getFeatureType()</li>
+        <li><b>Unlock Feature code:</b> $feature.getEdinaFeatureCode()</li>
+        
+        #if($feature.getCountry())
+        <li><b>Country:</b> $feature.getCountry()</li>
+        <li><b>Country code:</b> $feature.getCountryCode()</li>
+        #end
+        
+        <li><b>Custodian:</b> $feature.getCustodian()</li>
+        <li><b>Gazetteer:</b> $feature.getGazetteer()</li>
+        <li><b>Source id:</b> #if($feature.getSourceIdentifier() != 0.0)$feature.getSourceIdentifier()#else
+unknown#end</li>
+        #if($feature.getUriins())
+<li><b>uriins:</b> $feature.getUriins()</li>
+        #end
+        #if($feature.getUricdda())
+<li><b>uricdda:</b> $feature.getUricdda()</li>
+        #end
+        </ul>
+        #if($feature.getMadsid())
+<li><strong>madsid:</strong> $feature.getMadsid()</li>
+#end
+#if($feature.getVariantid())
+    <li><strong>variantid:</strong> $feature.getVariantid()</li>
+#end
+#if($feature.getAttestations())
+    <li><strong>attestations:</strong> $feature.getAttestations()</li>
+#end
+#if($feature.getLocations())
+    <li><strong>locations:</strong> $feature.getLocations()</li>
+#end
+#if($feature.getUnlockfpsrc())
+    <li><strong>unlockfpsrc:</strong> $feature.getUnlockfpsrc()</li>
+#end
+        <a href="http://unlock.edina.ac.uk/ws/footprintLookup?format=georss&identifier=$feature.getIdentifier()$key">Retrieve footprint geometry (Feature id: $feature.getIdentifier())</a>
+    ]]>
+	</summary>
+    <georss:box>$feature.getYmin() $feature.getXmin() $feature.getYmax() $feature.getXmax()</georss:box>
+    <georss:featuretypetag>$feature.getFeatureType()</georss:featuretypetag>
+    <georss:featurename>$feature.getNameEscapedXML()</georss:featurename>
+    <georss:relationshiptag>is-centered-at</georss:relationshiptag>
+    <georss:point>$feature.getCentroidY() $feature.getCentroidX()</georss:point>
+  </entry>
+#end
+#end
+</feed>

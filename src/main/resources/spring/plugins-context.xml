@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-autowire="byName">
+	
+	<!-- ====================================================================	-->
+	<!-- PropertyConfigurer for Service Layer									-->
+	<!-- ====================================================================	-->
+	<bean id="pluginsPropertyConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<value>classpath:config/plugins.properties</value>
+		</property>
+		<property name="placeholderPrefix" value="$pl{" />
+	</bean>
+	
+	<!-- ====================================================================	-->
+	<!-- Format Provider Plugins and Plugin Registry Definition					-->
+	<!-- ====================================================================	-->
+	
+	<bean name="formatProviderPluginRegistry"
+		class="edina.geocrosswalk.service.plugins.DefaultFormatProviderPluginRegistry">
+		<property name="registeredPlugins">
+			<map>
+				<entry key="GXW" value-ref="unlockXMLProvider" />
+				<entry key="KML" value-ref="kmlXMLProvider" />
+				<entry key="JSON" value-ref="jsonXMLProvider" />
+				<entry key="GEORSS" value-ref="georssXMLProvider" />
+				<entry key="TXT" value-ref="txtXMLProvider" />
+				<entry key="HTML" value-ref="htmlXMLProvider" />
+			</map>
+		</property>
+	</bean>
+	
+	
+	<bean name="sparseFormatProviderPluginRegistry"
+		class="edina.geocrosswalk.service.plugins.SparseFormatProviderPluginRegistry">
+		<property name="registeredPlugins">
+			<map>
+				<entry key="JSON" value-ref="sparseJsonXMLProvider" />
+				<entry key="GXW" value-ref="sparseUnlockXMLProvider" />
+				<entry key="TXT" value-ref="sparseTxtProvider" />
+			</map>
+		</property>
+	</bean>
+	
+	<!--  Format Provider Plugin Definitions -->
+	
+	<bean id="abstractFormatProvider" class="edina.geocrosswalk.service.plugins.AbstractFormatProviderPlugin" abstract="true">
+		<property name="velocityEngine" ref="velocityEngine"/>
+	</bean>
+	
+	<bean id="abstractSparseFormatProvider" class="edina.geocrosswalk.service.plugins.AbstractSparseFormatProviderPlugin" abstract="true">
+		<property name="velocityEngine" ref="velocityEngine"/>
+	</bean>
+	<bean id="unlockXMLProvider" class="edina.geocrosswalk.service.plugins.GXWFormatProviderPlugin" parent="abstractFormatProvider">
+		<property name="featureFormatTemplate" value="$pl{unlock.feature.template}"/>
+		<property name="footprintFormatTemplate" value="$pl{unlock.footprint.template}"/>
+		<property name="featureTypesFormatTemplate" value="$pl{unlock.featuretypes.template}"/>
+		</bean>
+	
+	<bean id="kmlXMLProvider" class="edina.geocrosswalk.service.plugins.KMLFormatProviderPlugin" parent="abstractFormatProvider">
+		<property name="featureFormatTemplate" value="$pl{kml.feature.template}"/>
+		<property name="footprintFormatTemplate" value="$pl{kml.footprint.template}"/>
+		<property name="featureTypesFormatTemplate" value="$pl{kml.featuretypes.template}"/>
+	</bean>
+
+	<bean id="jsonXMLProvider" class="edina.geocrosswalk.service.plugins.JSONFormatProviderPlugin" parent="abstractFormatProvider">
+		<property name="featureFormatTemplate" value="$pl{json.feature.template}"/>
+		<property name="footprintFormatTemplate" value="$pl{json.footprint.template}"/>
+		<property name="featureTypesFormatTemplate" value="$pl{json.featuretypes.template}"/>
+	</bean>
+	
+	<bean id="georssXMLProvider" class="edina.geocrosswalk.service.plugins.GEORSSFormatProviderPlugin" parent="abstractFormatProvider">
+		<property name="featureFormatTemplate" value="$pl{georss.feature.template}"/>
+		<property name="footprintFormatTemplate" value="$pl{georss.footprint.template}"/>
+		<property name="featureTypesFormatTemplate" value="$pl{georss.featuretypes.template}"/>
+	</bean>
+		
+	<bean id="txtXMLProvider" class="edina.geocrosswalk.service.plugins.TXTFormatProviderPlugin" parent="abstractFormatProvider">
+		<property name="featureFormatTemplate" value="$pl{txt.feature.template}"/>
+		<property name="footprintFormatTemplate" value="$pl{txt.footprint.template}"/>
+		<property name="featureTypesFormatTemplate" value="$pl{txt.featuretypes.template}"/>
+	</bean>
+		
+	<bean id="htmlXMLProvider" class="edina.geocrosswalk.service.plugins.HTMLFormatProviderPlugin" parent="abstractFormatProvider">
+		<property name="featureFormatTemplate" value="$pl{html.feature.template}"/>
+		<property name="footprintFormatTemplate" value="$pl{html.footprint.template}"/>
+		<property name="featureTypesFormatTemplate" value="$pl{html.featuretypes.template}"/>
+	</bean>
+		
+	<bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="preferFileSystemAccess" value="false"/>
+		<property name="resourceLoaderPath" value="classpath:templates/"/>
+	</bean>		
+	
+	
+	<bean id="sparseJsonXMLProvider" class="edina.geocrosswalk.service.plugins.SparseJSONFormatProviderPlugin" parent="abstractSparseFormatProvider">
+		<property name="template" value="$pl{json.sparse.template}"/>
+	</bean>
+	<bean id="sparseUnlockXMLProvider" class="edina.geocrosswalk.service.plugins.SparseGXWFormatProviderPlugin" parent="abstractSparseFormatProvider">
+		<property name="template" value="$pl{unlock.sparse.template}"/>
+	</bean>
+	
+	<bean id="sparseTxtProvider" class="edina.geocrosswalk.service.plugins.SparseTXTFormatProviderPlugin" parent="abstractSparseFormatProvider">
+		<property name="template" value="$pl{txt.sparse.template}"/>
+	</bean>
+</beans>

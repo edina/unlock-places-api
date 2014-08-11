@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.4.xsd">
+
+
+	<!-- ==================================================================== -->
+	<!-- Security Layer PropertyConfigurer -->
+	<!-- ==================================================================== -->
+
+	<bean id="loggingPropertyConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		lazy-init="default">
+		<property name="locations">
+			<list>
+				<!-- database.properties should be in shared directory of tomcat -->
+				<value>classpath:database.properties</value>
+				<value>classpath:sql/logging-sql.properties</value>
+			</list>
+		</property>
+		<property name="placeholderPrefix" value="$log{" />
+	</bean>
+
+	<bean id="loggingDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="$log{geoxwalk.postgis.jdbc.driver}" />
+		<property name="url" value="$log{geoxwalk.postgis.jdbc.url}" />
+		<property name="username" value="$log{geoxwalk.postgis.jdbc.username}" />
+		<property name="password" value="$log{geoxwalk.postgis.jdbc.password}" />
+	</bean>
+
+
+	<!-- ======================================================== -->
+	<!-- Authentication / Authorisation Event Logging -->
+	<!-- ======================================================== -->
+
+	<bean id="loggingService" class="edina.geocrosswalk.service.DefaultLoggingService">
+		<property name="loggerDao" ref="loggerDao" />
+	</bean>
+
+	<bean id="authEventListener" class="edina.geocrosswalk.logging.AuthenticationEventListener">
+		<property name="loggingService" ref="loggingService" />
+	</bean>
+
+	<bean id="loggerDao" class="edina.geocrosswalk.logging.DefaultLoggerDao">
+		<property name="saveLoggerDetailsSql" value="$log{save.logger.details.sql}" />
+		<property name="dataSource" ref="loggingDataSource" />
+	</bean>
+
+</beans>

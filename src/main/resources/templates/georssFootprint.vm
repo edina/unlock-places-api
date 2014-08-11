@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" 
+  xmlns:georss="http://www.georss.org/georss">
+  <title>Unlock results</title>
+#if($totalFootprintsCount == 0)
+  <subtitle>Total results: 0</subtitle>
+  <link href="http://unlock.edina.ac.uk/"/>
+  <updated>2009-10-01T00:00:00Z</updated>
+  <author>
+  <name>EDINA</name>
+  <email>edina@ed.ac.uk</email>
+  </author>
+#else
+  <subtitle>Total results: $totalFootprintsCount</subtitle>
+  <link href="http://unlock.edina.ac.uk"/>
+  <updated>2009-10-01T00:00:00Z</updated>
+  <author>
+    <name>EDINA</name>
+    <email>edina@ed.ac.uk</email>
+  </author>
+  <id>Unlock results</id>
+		$output
+  #end
+</feed>

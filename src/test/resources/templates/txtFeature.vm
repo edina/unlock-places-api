@@ -1,0 +1,8 @@
+$totalResultsCount
+#if($totalResultsCount>0)
+id, name, country, countrycode, featuretype, unlockFeatureCode, custodian, gazetteer, minx, miny, maxx, maxy#if($featureList.get(0).getUriins()), uriins, #end#if($featureList.get(0).getUricdda())uricdda,#end #if($featureList.get(0).getMadsid())madsid,#end #if($featureList.get(0).getVariantid())variantid,#end #if($featureList.get(0).getAttestations())attestations,#end #if($featureList.get(0).getLocations())locations,#end #if($featureList.get(0).getUnlockfpsrc())unlockfpsrc#end
+
+#foreach( $feature in $featureList )
+"$feature.getIdentifier()", "$feature.getName()", "$feature.getCountry()", "$feature.getCountryCode()", "$feature.getFeatureType()", "$feature.getEdinaFeatureCode()", "$feature.getCustodian()", "$feature.getGazetteer()", "$feature.getXmin()", "$feature.getYmin()", "$feature.getXmax()", "$feature.getYmax()" #if($feature.getUriins()),"$feature.getUriins()", #end #if($feature.getUricdda())"$feature.getUricdda()"#end #if($feature.getMadsid())"$feature.getMadsid()"#end #if($feature.getVariantid())"$feature.getVariantid()"#end #if($feature.getAttestations())"$feature.getAttestationsSingleQuotes()()"#end #if($feature.getLocations())"$feature.getLocationsSingleQuotes()"#end #if($feature.getUnlockfpsrc())"$feature.getUnlockfpsrc()"#end #if ($velocityCount != $featureList.size())
+
+#end#end#end

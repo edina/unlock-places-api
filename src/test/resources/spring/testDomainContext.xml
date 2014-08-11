@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:oxm="http://www.springframework.org/schema/oxm" xmlns:mvc="http://www.springframework.org/schema/mvc"
+  xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
+  default-autowire="byName"
+  xsi:schemaLocation=" http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring
+     http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
+	
+	<!-- ====================================================================	-->
+	<!-- PropertyConfigurer for Domain Layer									-->
+	<!-- ====================================================================	-->
+		
+	<bean id="domainPropertyConfig" 
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:config/database.properties</value>
+			</list>
+		</property>
+		<property name="placeholderPrefix" value="$domain{"/>
+	</bean>
+	
+	<!-- ====================================================================	-->
+	<!-- DataSource Definitions													-->
+	<!-- ====================================================================	-->
+	
+	<bean id="postgresDataSource" class="org.apache.commons.dbcp.BasicDataSource" lazy-init="true" destroy-method="close">
+		<property name="driverClassName" value="$domain{postgis.jdbc.driver}"/>
+		<property name="url" value="$domain{postgis.jdbc.url}"/>
+		<property name="username" value="$domain{postgis.jdbc.username}"/>
+		<property name="password" value="$domain{postgis.jdbc.password}"/>
+		<property name="defaultAutoCommit" value="false"/>
+	</bean>
+
+
+	<!-- ====================================================================	-->
+	<!-- DAO Definitions														-->
+	<!-- ====================================================================	-->
+	
+	<bean id="abstractGXWDao" class="edina.geocrosswalk.domain.dao.AbstractGXWDao" abstract="true">
+		<property name="dataSource" ref="postgresDataSource"/>
+	</bean>
+	
+	<bean id="spatialDao" class="edina.geocrosswalk.domain.dao.DefaultSpatialDao" parent="abstractGXWDao"/>
+	
+  <!-- So we can use @Autowired to get a bean e.g cache manager -->
+  <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+	
+	 <!-- Configure ehcache -->
+  <ehcache:annotation-driven cache-manager="ehCacheManager"
+    proxy-target-class="true" />
+
+  <bean id="ehCacheManager"
+    class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+    <property name="cacheManagerName" value="UnlockPlacesAPICacheManager"/>
+    <property name="configLocation" value="classpath:config/ehcache.xml" />
+  </bean>
+  
+
+</beans>

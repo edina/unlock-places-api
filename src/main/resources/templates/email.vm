@@ -1,0 +1,6 @@
+
+An application exception occurred on: ${date}.
+
+The exception was:  ${exception}
+
+${stack}

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.4.xsd">
+
+	<!-- ==================================================================== -->
+	<!-- Security Layer PropertyConfigurer -->
+	<!-- ==================================================================== -->
+
+	<bean id="securityPropertyConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		lazy-init="default">
+		<property name="locations">
+			<list>
+				<!-- database.properties should be in shared directory of tomcat -->
+				<value>classpath:database.properties</value>
+				<value>classpath:config/security.properties</value>
+				<value>classpath:sql/security-sql.properties</value>
+			</list>
+		</property>
+		<property name="placeholderPrefix" value="$sec{" />
+	</bean>
+
+	<!-- ======================================================== -->
+	<!-- Security Filter Definitions -->
+	<!-- ======================================================== -->
+
+	<bean id="filterChainProxy" class="org.springframework.security.util.FilterChainProxy">
+		<security:filter-chain-map path-type="ant">
+			<security:filter-chain pattern="/**"
+				filters="exceptionTranslationFilter,securityEnforcementFilter,filterInvocationInterceptor" />
+		</security:filter-chain-map>
+	</bean>
+
+	<bean id="exceptionTranslationFilter" class="edina.geocrosswalk.security.ExceptionTranslationFilter">
+		<property name="velocityEngine" ref="securityVelocityEngine" />
+		<property name="errorTemplate" value="error.vm" />
+	</bean>
+
+	<bean id="securityEnforcementFilter" class="edina.geocrosswalk.security.SecurityEnforcementFilter">
+		<property name="anonymousKey" value="$sec{anonymous.key}" />
+	</bean>
+
+	<bean id="filterInvocationInterceptor"
+		class="org.springframework.security.intercept.web.FilterSecurityInterceptor">
+		<property name="alwaysReauthenticate" value="true" />
+		<property name="authenticationManager" ref="authenticationManager" />
+		<property name="accessDecisionManager" ref="accessDecisionManager" />
+		<property name="objectDefinitionSource">
+			<security:filter-invocation-definition-source>
+				<security:intercept-url pattern='/**'
+					access='ROLE_ANONYMOUS_USER,ROLE_DIGIMAP_USER' />
+			</security:filter-invocation-definition-source>
+		</property>
+	</bean>
+
+	<!-- ======================================================== -->
+	<!-- Provider Manager and Authentication Provider Definitions -->
+	<!-- ======================================================== -->
+
+	<bean id="authenticationManager" class="org.springframework.security.providers.ProviderManager">
+		<property name="providers">
+			<list>
+				<ref local="anonymousAuthenticationProvider" />
+				<ref local="daoAuthenticationProvider" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="anonymousAuthenticationProvider"
+		class="org.springframework.security.providers.anonymous.AnonymousAuthenticationProvider">
+		<property name="key" value="$sec{anonymous.key}" />
+	</bean>
+
+	<bean id="daoAuthenticationProvider"
+		class="edina.geocrosswalk.security.DefaultDaoAuthenticationProvider">
+		<property name="userDetailsService" ref="userDetailsService" />
+	</bean>
+
+
+	<!-- ======================================================== -->
+	<!-- Access Decision Manager Definitions -->
+	<!-- ======================================================== -->
+
+
+	<bean id="accessDecisionManager" class="org.springframework.security.vote.AffirmativeBased">
+		<property name="decisionVoters">
+			<list>
+				<ref local="roleVoter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="roleVoter" class="org.springframework.security.vote.RoleVoter" />
+
+
+	<!-- ======================================================== -->
+	<!-- User Details Services -->
+	<!-- ======================================================== -->
+
+	<bean id="userDetailsService"
+		class="edina.geocrosswalk.security.AuthenticationUserDetailsService">
+		<property name="userDao" ref="userDao" />
+	</bean>
+
+	<bean id="userDao"
+		class="edina.geocrosswalk.security.AuthenticationUserDetailsDao">
+		<property name="dataSource" ref="securityDataSource" />
+		<property name="userDetailsSql" value="$sec{user.details.sql}" />
+	</bean>
+
+	<bean id="securityDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="$sec{jdbc.userapplication.driverClassName}" />
+		<property name="url" value="$sec{jdbc.userapplication.url}" />
+		<property name="username" value="$sec{jdbc.userapplication.username}" />
+		<property name="password" value="$sec{jdbc.userapplication.password}" />
+	</bean>
+
+	<bean id="securityVelocityEngine"
+		class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="preferFileSystemAccess" value="false" />
+		<property name="resourceLoaderPath" value="/WEB-INF/velocity/" />
+	</bean>
+
+</beans>
+

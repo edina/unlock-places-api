@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+ #if($totalFeatureTypesCount == 0)
+ 	<Document/>
+ #else
+  <Document>
+#foreach( $featureType in $featureTypesList )
+	<Folder xmlns="">
+      <name>$featureType.getName()</name>
+      <featureCode>$featureType.getFeatureCode()</featureCode>
+      <hierarchyLevel>$featureType.getHierarchyLevel()</hierarchyLevel>
+	</Folder>
+#end
+  </Document>
+#end
+</kml>

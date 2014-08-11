@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<rdf:RDF xmlns="http://www.geonames.org/ontology#" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:owl="http://www.w3.org/2002/07/owl#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:wgs84_pos="http://www.w3.org/2003/01/geo/wgs84_pos#">
+<Feature rdf:about="http://unlock.edina.ac.uk/$feature.getIdentifier()/">
+<name>$feature.getName()</name>
+#if($feature.getPopulation() != 0.0)
+<population>$feature.getPopulation()</population>
+#end
+<wgs84_pos:lat>$feature.getXCentroid()</wgs84_pos:lat>
+<wgs84_pos:long>$feature.getYCentroid()</wgs84_pos:long>
+</Feature>
+</rdf:RDF>

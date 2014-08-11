@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unlock version="3.0">
+#if($totalFootprintCount == 0)
+	<error>Footprint not found</error>
+#else
+  <totalFootprintsCount>$totalFootprintsCount</totalFootprintsCount>
+		$output
+#end
+</unlock>

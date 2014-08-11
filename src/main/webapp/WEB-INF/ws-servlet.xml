@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:oxm="http://www.springframework.org/schema/oxm" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
+	default-autowire="byName"
+	xsi:schemaLocation=" http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring
+     http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">
+
+	<import resource="classpath:spring/service-context.xml" />
+	<import resource="classpath:spring/plugins-context.xml" />
+
+	<!-- ==================================================================== -->
+	<!-- Web Tier PropertyConfigurer -->
+	<!-- ==================================================================== -->
+
+	<!-- Configure ehcache -->
+	<ehcache:annotation-driven cache-manager="ehCacheManager"
+		proxy-target-class="false" />
+
+  <!-- So we can use @Autowired to get a bean e.g cache manager -->
+  <bean	class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+
+	<bean id="ehCacheManager"
+		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="cacheManagerName" value="UnlockPlacesAPICacheManager"/>
+		<property name="configLocation" value="/WEB-INF/ehcache.xml" />
+	</bean>
+	
+	<!-- register cache with JMX -->
+	<bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
+		<property name="locateExistingServerIfPossible" value="true" />
+	</bean>
+
+	<bean
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass" value="net.sf.ehcache.management.ManagementService" />
+		<property name="targetMethod" value="registerMBeans" />
+		<property name="arguments">
+			<list>
+				<ref bean="ehCacheManager" />
+				<ref bean="mbeanServer" />
+				<value>true</value>
+				<value>true</value>
+				<value>true</value>
+				<value>true</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="wsPropertyConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:config/ws.properties</value>
+			</list>
+		</property>
+		<property name="placeholderPrefix" value="$ws{" />
+	</bean>
+
+	<!-- ==================================================================== -->
+	<!-- Web Service Controller Definitions -->
+	<!-- ==================================================================== -->
+
+	<bean id="abstractCommandController" class="edina.geocrosswalk.web.ws.AbstractGXWCommandController"
+		abstract="true">
+		<property name="spatialService" ref="spatialService" />
+		<property name="formatProviderService" ref="formatProviderService" />
+		<property name="errorTemplate" value="$ws{error.template}" />
+	</bean>
+
+	<!-- Name Search API Endpoint -->
+	<bean name="/nameSearch" class="edina.geocrosswalk.web.ws.NameSearchController"
+		parent="abstractCommandController">
+		<property name="commandName" value="nameCommand" />
+		<property name="commandClass" value="edina.geocrosswalk.web.ws.NameSearchCommand" />
+		<property name="validator" ref="nameSearchCommandValidator" />
+	</bean>
+
+	<!-- Name Search API Endpoint -->
+	<bean name="/nameIndexSearch" class="edina.geocrosswalk.web.ws.NameIndexSearchController"
+		parent="abstractCommandController">
+		<property name="commandName" value="nameStartsWithSearchCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.NameStartsWithSearchCommand" />
+		<property name="validator" ref="autoCompleteCommandValidator" />
+	</bean>
+
+	<!-- Starts-with Name Search API Endpoint -->
+	<bean name="/nameStartsWith"
+		class="edina.geocrosswalk.web.ws.NameStartsWithSearchController"
+		parent="abstractCommandController">
+		<property name="commandName" value="nameStartsWithSearchCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.NameStartsWithSearchCommand" />
+		<property name="validator" ref="nameStartsWithSearchCommandValidator" />
+	</bean>
+
+	<!-- Footprint Lookup API Endpoint -->
+	<bean name="/footprintLookup" class="edina.geocrosswalk.web.ws.FootprintLookupController"
+		parent="abstractCommandController">
+		<property name="commandName" value="footprintCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.FootprintLookupCommand" />
+		<property name="validator" ref="footprintLookupCommandValidator" />
+	</bean>
+
+	<!-- Name and Feature-type Lookup API Endpoint -->
+	<bean name="/nameAndFeatureSearch"
+		class="edina.geocrosswalk.web.ws.NameAndFeatureSearchController"
+		parent="abstractCommandController">
+		<property name="commandName" value="nameAndFeatureSearchCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.NameAndFeatureSearchCommand" />
+		<property name="validator" ref="nameAndFeatureSearchCommandValidator" />
+	</bean>
+
+	<!-- Spatial Name Search API Endpoint -->
+	<bean name="/spatialNameSearch" class="edina.geocrosswalk.web.ws.SpatialNameSearchController"
+		parent="abstractCommandController">
+		<property name="commandName" value="spatialNameSearchCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.SpatialNameSearchCommand" />
+		<property name="validator" ref="spatialNameSearchCommandValidator" />
+	</bean>
+
+	<!-- Spatial Feature-type Search API Endpoint -->
+	<bean name="/spatialFeatureSearch"
+		class="edina.geocrosswalk.web.ws.SpatialFeatureSearchController"
+		parent="abstractCommandController">
+		<property name="commandName" value="spatialFeatureSearchCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.SpatialFeatureSearchCommand" />
+		<property name="validator" ref="spatialFeatureSearchCommandValidator" />
+	</bean>
+
+	<!-- Post Code Search API Endpoint -->
+	<bean name="/postCodeSearch" class="edina.geocrosswalk.web.ws.PostCodeSearchController"
+		parent="abstractCommandController">
+		<property name="commandName" value="postCodeSearchCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.PostCodeSearchCommand" />
+		<property name="validator" ref="postCodeSearchCommandValidator" />
+	</bean>
+
+	<!-- Supported Feature Types API Endpoint -->
+	<bean name="/supportedFeatureTypes"
+		class="edina.geocrosswalk.web.ws.SupportedFeatureTypesController"
+		parent="abstractCommandController">
+		<property name="commandName" value="supportedFeatureTypesCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.SupportedFeatureTypesCommand" />
+		<property name="validator" ref="supportedFeatureTypesCommandValidator" />
+	</bean>
+
+	<!-- Closest Match Search API Endpoint -->
+	<bean name="/closestMatchSearch"
+		class="edina.geocrosswalk.web.ws.ClosestMatchSearchController" parent="abstractCommandController">
+		<property name="commandName" value="closestMatchSearchCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.ClosestMatchSearchCommand" />
+		<property name="validator" ref="closestMatchSearchCommandValidator" />
+	</bean>
+
+	<!-- Feature Lookup API Endpoint -->
+	<bean name="/featureLookup" class="edina.geocrosswalk.web.ws.FeatureLookupController"
+		parent="abstractCommandController">
+		<property name="commandName" value="featureLookupCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.FeatureLookupCommand" />
+		<property name="validator" ref="featureLookupCommandValidator" />
+	</bean>
+
+	<!-- Unique Name Search API Endpoint -->
+	<bean name="/uniqueNameSearch" class="edina.geocrosswalk.web.ws.UniqueNameSearchController"
+		parent="abstractCommandController">
+		<property name="commandName" value="uniqueNameSearchCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.UniqueNameSearchCommand" />
+		<property name="validator" ref="uniqueNameSearchCommandValidator" />
+	</bean>
+
+	<!-- Generic Search API Endpoint -->
+	<bean name="/search" class="edina.geocrosswalk.web.ws.SearchController"
+		parent="abstractCommandController">
+		<property name="commandName" value="SearchCommand" />
+		<property name="commandClass" value="edina.geocrosswalk.web.ws.SearchCommand" />
+		<property name="validator" ref="searchCommandValidator" />
+	</bean>
+
+
+	<!-- Distance between two geometries API Endpoint -->
+	<bean name="/distanceBetween" class="edina.geocrosswalk.web.ws.DistanceController"
+		parent="abstractCommandController">
+		<property name="commandName" value="distanceCommand" />
+		<property name="commandClass" value="edina.geocrosswalk.web.ws.DistanceCommand" />
+		<property name="validator" ref="distanceCommandValidator" />
+		<property name="sparseFormatProviderService" ref="sparseFormatProviderService"></property>
+	</bean>
+
+	<!-- Buffered Search features API Endpoint -->
+	<bean name="/bufferedSearch" class="edina.geocrosswalk.web.ws.BufferedSearchController"
+		parent="abstractCommandController">
+		<property name="commandName" value="bufferedSearchCommand" />
+		<property name="commandClass"
+			value="edina.geocrosswalk.web.ws.BufferedSearchCommand" />
+		<property name="validator" ref="bufferedSearchCommandValidator" />
+	</bean>
+
+	<!-- ==================================================================== -->
+	<!-- Parameter Validators -->
+	<!-- ==================================================================== -->
+
+	<bean id="nameValidator" class="edina.geocrosswalk.web.ws.validator.NameValidator">
+		<property name="nameValidationRegex" value="$ws{name.validation.regex}" />
+	</bean>
+
+	<bean id="identifierValidator" class="edina.geocrosswalk.web.ws.validator.IdentifierValidator">
+		<property name="identifierValidationRegex" value="$ws{identifier.validation.regex}" />
+	</bean>
+
+	<bean id="featureValidator" class="edina.geocrosswalk.web.ws.validator.FeatureValidator">
+		<property name="featureValidationRegex" value="$ws{feature.validation.regex}" />
+	</bean>
+
+	<bean id="postCodeValidator" class="edina.geocrosswalk.web.ws.validator.PostCodeValidator">
+		<property name="postCodeValidationRegex" value="$ws{postcode.validation.regex}" />
+	</bean>
+
+	<bean id="bboxValidator"
+		class="edina.geocrosswalk.web.ws.validator.BoundingBoxValidator">
+	</bean>
+
+	<bean id="srsBboxValidator" class="edina.geocrosswalk.web.ws.validator.SrsBboxValidator">
+	</bean>
+
+	<bean id="operatorValidator" class="edina.geocrosswalk.web.ws.validator.OperatorValidator">
+		<property name="supportedOperators" value="$ws{supported.spatial.operators}" />
+	</bean>
+
+
+
+	<!-- ==================================================================== -->
+	<!-- Search Command Validators -->
+	<!-- ==================================================================== -->
+
+	<bean id="abstractCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.AbstractGXWCommandValidator"
+		abstract="true">
+		<property name="maxRowSize" value="$ws{max.row.size}" />
+		<property name="gazetteerList" value="$ws{gazetteer.validation.list}" />
+		<property name="countryList" value="$ws{country.validation.list}" />
+		<property name="srsList" value="$ws{srs.validation.list}" />
+	</bean>
+
+	<bean name="nameSearchCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.NameSearchCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="nameValidator" ref="nameValidator" />
+	</bean>
+
+	<bean name="nameStartsWithSearchCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.NameStartsWithSearchCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="nameValidator" ref="nameValidator" />
+	</bean>
+
+	<bean name="autoCompleteCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.AutoCompleteCommandValidator"
+		parent="nameStartsWithSearchCommandValidator">
+		<property name="nameValidator" ref="nameValidator" />
+	</bean>
+
+	<bean name="footprintLookupCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.FootprintLookupCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="identifierValidator" ref="identifierValidator" />
+	</bean>
+
+	<bean name="nameAndFeatureSearchCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.NameAndFeatureSearchCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="nameValidator" ref="nameValidator" />
+		<property name="featureValidator" ref="featureValidator" />
+	</bean>
+
+	<bean name="postCodeSearchCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.PostCodeSearchCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="postCodeValidator" ref="postCodeValidator" />
+	</bean>
+
+	<bean name="spatialNameSearchCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.SpatialNameSearchCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="nameValidator" ref="nameValidator" />
+		<property name="bboxValidator" ref="bboxValidator" />
+		<property name="srsBboxValidator" ref="srsBboxValidator" />
+	</bean>
+
+	<bean name="spatialFeatureSearchCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.SpatialFeatureSearchCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="featureValidator" ref="featureValidator" />
+		<property name="bboxValidator" ref="bboxValidator" />
+		<property name="srsBboxValidator" ref="srsBboxValidator" />
+	</bean>
+
+	<bean name="supportedFeatureTypesCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.SupportedFeatureTypesCommandValidator"
+		parent="abstractCommandValidator">
+	</bean>
+
+	<bean name="closestMatchSearchCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.ClosestMatchSearchCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="nameValidator" ref="nameValidator" />
+	</bean>
+
+	<bean name="featureLookupCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.FeatureLookupCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="identifierValidator" ref="identifierValidator" />
+	</bean>
+
+	<bean name="uniqueNameSearchCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.UniqueNameSearchCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="nameValidator" ref="nameValidator" />
+	</bean>
+
+	<bean name="searchCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.SearchCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="nameValidator" ref="nameValidator" />
+		<property name="bboxValidator" ref="bboxValidator" />
+		<property name="featureValidator" ref="featureValidator" />
+	</bean>
+
+
+	<bean name="distanceCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.DistanceCommandValidator"
+		parent="abstractCommandValidator">
+
+	</bean>
+
+	<bean name="bufferedSearchCommandValidator"
+		class="edina.geocrosswalk.web.ws.validator.BufferedSearchCommandValidator"
+		parent="abstractCommandValidator">
+		<property name="featureValidator" ref="featureValidator" />
+	</bean>
+
+	<!-- ==================================================================== -->
+	<!-- Exception Handling -->
+	<!-- ==================================================================== -->
+
+	<bean class="edina.geocrosswalk.web.ws.GXWExceptionResolver">
+		<property name="velocityEngine" ref="wsVelocityEngine" />
+		<property name="validationErrorTemplate" value="error.vm" />
+		<property name="emailTemplate" value="email.vm" />
+		<property name="mailSender" ref="mailSender" />
+		<property name="emailRecipients" value="$ws{email.recipients}" />
+	</bean>
+
+	<bean id="wsVelocityEngine"
+		class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="preferFileSystemAccess" value="false" />
+		<property name="resourceLoaderPath" value="/WEB-INF/velocity/" />
+	</bean>
+
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="$ws{smtp.host}" />
+	</bean>
+</beans>

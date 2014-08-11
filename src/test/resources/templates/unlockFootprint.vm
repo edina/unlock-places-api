@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unlock version="2.0">
+#if($totalFootprintCount == 0)
+	<error>No footprint found</error>
+#else
+  <footprint>
+    <identifier>$identifier</identifier>
+    <custodian>$custodian</custodian>
+		$output
+  </footprint>
+#end
+</unlock>

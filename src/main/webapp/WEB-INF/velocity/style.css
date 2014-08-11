@@ -1,0 +1,9 @@
+@charset "utf-8";
+
+/* CSS Document */
+body {
+	padding: 0px;
+	margin: 0px;
+	font-family: "Helvetica", "Arial", "Georgia", sans-serif;
+	background-color:#ff0000;
+}

@@ -1,0 +1,9 @@
+{ "type": "Feature",
+    "geometry" : {
+		$output
+    },
+    "properties" : {
+      "id" : "$identifier",
+      "custodian" : "$custodian"
+    }
+}

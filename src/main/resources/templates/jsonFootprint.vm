@@ -1,0 +1,9 @@
+#if($output)
+$callbackHeader{
+  "type" : "FootprintCollection",
+  "footprints" : [
+$output
+  ],
+  "totalResults" : "$totalFootprintsCount"
+}$callbackFooter
+#end

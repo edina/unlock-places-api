@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unlock version="3.0">
+#if($totalFeatureTypesCount == 0)
+	<error>No feature types found</error>
+#else
+   <totalFeatureTypesCount>$totalFeatureTypesCount</totalFeatureTypesCount>
+   <featureTypes>
+#foreach( $l1 in $featureTypesList )
+      <featureType name="$l1.getName()" featureCode="$l1.getCode()" level="$l1.getLevel()"#if($l1.getChildren().size() == 0)/>#{else}>#end
+
+#if($l1.getChildren().size() > 0)
+#foreach( $l2 in $l1.getChildren())
+         <featureType name="$l2.getName()" featureCode="$l2.getCode()" level="$l2.getLevel()"#if($l2.getChildren().size() == 0)/>#{else}>#end
+
+#if($l2.getChildren().size() > 0)
+#foreach( $l3 in $l2.getChildren())
+            <featureType name="$l3.getName()" featureCode="$l3.getCode()" level="$l3.getLevel()"#if($l3.getChildren().size() == 0)/>#{else}>#end
+
+#if($l3.getChildren().size() > 0)
+#foreach( $l4 in $l3.getChildren())
+               <featureType name="$l4.getName()" featureCode="$l4.getCode()" level="$l4.getLevel()"#if($l4.getChildren().size() == 0)/>#{else}>#end
+
+#if($l4.getChildren().size() > 0)
+#foreach( $l5 in $l4.getChildren())
+                  <featureType name="$l5.getName()" featureCode="$l5.getCode()" level="$l5.getLevel()"#if($l5.getChildren().size() == 0)/>#{else}>#end
+
+#if($l5.getChildren().size() > 0)
+#foreach( $l6 in $l5.getChildren())
+                     <featureType name="$l6.getName()" featureCode="$l6.getCode()" level="$l6.getLevel()"#if($l6.getChildren().size() == 0)/>#{else}>#end
+
+#if($l6.getChildren().size() > 0)
+#foreach( $l7 in $l6.getChildren())
+                        <featureType name="$l7.getName()" featureCode="$l7.getCode()" level="$l7.getLevel()"#if($l7.getChildren().size() == 0)/>#{else}>#end
+#end
+                     </featureType>
+#end
+#end
+                  </featureType>
+#end
+#end
+               </featureType>
+#end
+#end
+            </featureType>
+#end
+#end
+         </featureType>
+#end
+#end
+      </featureType>
+#end
+#end
+   </featureTypes>
+#end
+</unlock>

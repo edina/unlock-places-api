@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unlock version="3.0">
+  <totalResultsCount>$totalResultsCount</totalResultsCount>
+#foreach( $feature in $featureList )
+  <feature>
+    <identifier>$feature.getIdentifier()</identifier>
+    <sourceIdentifier>#if($feature.getSourceIdentifier() != 0.0)
+$feature.getSourceIdentifier()#else
+unknown#end</sourceIdentifier>
+    <name>$feature.getNameEscapedXML()</name>
+    <minx>$feature.getXmin()</minx>
+    <miny>$feature.getYmin()</miny>
+    <maxx>$feature.getXmax()</maxx>
+    <maxy>$feature.getYmax()</maxy>
+    <featureType>$feature.getFeatureType()</featureType>
+    <unlockFeatureCode>$feature.getEdinaFeatureCode()</unlockFeatureCode>
+#if($feature.getCountry())
+    <country>$feature.getCountry()</country>
+#end
+#if($feature.getCountryCode())
+    <countryCode>$feature.getCountryCode()</countryCode>
+#end
+#if($feature.getAdminLevel1())
+    <adminLevel1>$feature.getAdminLevel1EscapedXML()</adminLevel1>
+#end
+#if($feature.getAdminLevel2())
+    <adminLevel2>$feature.getAdminLevel2EscapedXML()</adminLevel2>
+#end
+#if($feature.getAdminLevel3())
+    <adminLevel3>$feature.getAdminLevel3EscapedXML()</adminLevel3>
+#end
+#if($feature.getAdminLevel4())
+    <adminLevel4>$feature.getAdminLevel4EscapedXML()</adminLevel4>
+#end
+    <custodian>$feature.getCustodian()</custodian>
+    <gazetteer>$feature.getGazetteer()</gazetteer>
+#if($feature.getScale())
+    <scale>$feature.getScale()</scale>
+#end
+    <centroid>$feature.getXCentroid(),$feature.getYCentroid()</centroid>
+#if($feature.getArea() != 0.0)
+    <area>$feature.getArea()</area>
+#end
+#if($feature.getPerimeter() != 0.0)
+    <perimeter>$feature.getPerimeter()</perimeter>
+#end
+#if($feature.getElevation() != 0.0)
+    <elevation>$feature.getElevation()</elevation>
+#end    
+#if($feature.getPopulation() != 0.0)
+    <population>$feature.getPopulation()</population>
+#end
+#if($feature.getAlternativeNames())
+	#if($feature.getAlternativeNames() != "")
+    <altNames>$feature.getAlternativeNamesEscapedXML()</altNames>
+    #end
+#end
+#if($feature.getAlternativeIds().size())
+    <altIdentifiers>#foreach($altId in $feature.getAlternativeIds())$altId#if ($velocityCount != $feature.getAlternativeIds().size()), #end#end</altIdentifiers>
+#end
+    <geometryRef xlink:href="http://unlock.edina.ac.uk/ws/footprintLookup?identifier=$feature.getIdentifier()$key" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+#if($feature.getUriins())
+    <uriins xlink:href="$feature.getUriins()" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+#end
+#if($feature.getUricdda())
+    <uricdda xlink:href="$feature.getUricdda()" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+#end
+#if($feature.getMadsid())
+    <madsid>$feature.getMadsid()</madsid>
+#end
+#if($feature.getVariantid())
+    <variantid>$feature.getVariantid()</variantid>
+#end
+#if($feature.getAttestations())
+    <attestations>$feature.getAttestations()</attestations>
+#end
+#if($feature.getLocations())
+    <locations>$feature.getLocations()</locations>
+#end
+#if($feature.getUnlockfpsrc())
+    <unlockfpsrc>$feature.getUnlockfpsrc()</unlockfpsrc>
+#end
+  </feature>
+#end
+</unlock>

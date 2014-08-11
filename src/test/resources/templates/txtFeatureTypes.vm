@@ -1,0 +1,10 @@
+#if($totalFeatureTypesCount == 0)
+	$totalFeatureTypesCount
+#else
+$totalFeatureTypesCount
+name, featurecode, hierarchylevel
+#foreach( $featureType in $featureTypesList )
+$featureType.getName(), $featureType.getFeatureCode(), $featureType.getHierarchyLevel()#if ($velocityCount != $featureTypesList.size())
+#end
+#end
+#end

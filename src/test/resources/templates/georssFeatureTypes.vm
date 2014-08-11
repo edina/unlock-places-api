@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" 
+  xmlns:georss="http://www.georss.org/georss">
+  #if($totalFeatureTypeCount == 0)
+  	<title>GeoCrossWalk results</title>
+	<subtitle>Total results: 0</subtitle>
+	<link href="http://www.geoxwalk.ac.uk/"/>
+	<updated>2009-10-01T00:00:00Z</updated>
+	<author>
+	<name>EDINA</name>
+	<email>edina@ed.ac.uk</email>
+	</author>
+  #else
+  <title>GeoCrossWalk Feature Type Thesaurus</title>
+  <subtitle>Total number of feature types: $totalFeatureTypesCount</subtitle>
+  <link href="http://www.geoxwalk.ac.uk/"/>
+  <updated>2009-10-01T00:00:00Z</updated>
+  <author>
+    <name>EDINA</name>
+    <email>edina@ed.ac.uk</email>
+  </author>
+  #foreach( $featureType in $featureTypesList )
+  <entry>
+    <title>$featureType.getName()</title>
+    <id>$featureType.getFeatureCode()</id>
+    <summary>$featureType.getHierarchyLevel()</summary>
+    <georss:featuretypetag>$featureType.getName()</georss:featuretypetag>
+  </entry>
+#end
+#end
+</feed>
